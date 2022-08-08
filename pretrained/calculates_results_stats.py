@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# */AIPND-revision/intropyproject-classify-pet-images/calculates_results_stats.py
+# */AIPND-revision/intropyproject-classify-pet-images/calculates_results_stats_hints.py
 #                                                                             
-# PROGRAMMER: Austin Kaburia
-# DATE CREATED:             06/08/2022                     
+# PROGRAMMER:
+# DATE CREATED:                                  
 # REVISED DATE: 
-# PURPOSE: Create a function calculates_results_stats that calculates the 
-#          statistics of the results of the programrun using the classifier's model 
+# PURPOSE: This is a *hints* file to help guide students in creating the 
+#          function calculates_results_stats that calculates the statistics
+#          of the results of the programrun using the classifier's model 
 #          architecture to classify the images. This function will use the 
 #          results in the results dictionary to calculate these statistics. 
 #          This function will then put the results statistics in a dictionary
@@ -38,63 +39,30 @@
 #            pct_correct_notdogs - percentage of correctly classified NON-dogs
 #
 ##
-# TODO 5: Define calculates_results_stats function below, please be certain to replace None
-#       in the return statement with the results_stats_dic dictionary that you create 
-#       with this function
-# # 
-# def calculates_results_stats(results_dic):
-# #     example_dictionary = {'n_correct_dogs': 30, 'pct_correct_dogs': 100.0, 'n_correct_breed': 24, 'pct_correct_breed': 80.0}
-#     results_stats_dic = dict()
-#     no_images = len(results_dic.keys())
-#     no_dog_images = 0
-#     no_non_dogs = no_images - no_dog_images
-#     results_stats_dic['n_correct_dogs'] = 0
-#     results_stats_dic['non_dogs'] = 0
-#     results_stats_dic['n_correct_breed'] = 0
-    
-#     for key in results_dic:
-#         if results_dic[key][3] == 1 and results_dic[key][4] == 1:
-#             results_stats_dic['n_correct_dogs'] += 1
-#         if  results_dic[key][3] == 1:
-#             no_dog_images += 1
-#         if results_dic[key][3] == 0 and results_dic[key][4] == 0:
-#             results_stats_dic['non_dogs'] += 1
-#         if results_dic[key][3] == 1 and results_dic[key][2] == 1:
-#             results_stats_dic['n_correct_breed'] += 0
-            
-# #     results_stats_dic['pct_correct_dogs'] = results_stats_dic['n_correct_dogs']/no_dog_images * 100
-# #     results_stats_dic['pct_correct_non_dogs'] = results_stats_dic['non_dogs']/no_non_dogs * 100
-# #     results_stats_dic['pct_correct_breed'] = results_stats_dic['correct_breed']/no_dog_images * 100
-    
-  
-#     """
-#     Calculates statistics of the results of the program run using classifier's model 
-#     architecture to classifying pet images. Then puts the results statistics in a 
-#     dictionary (results_stats_dic) so that it's returned for printing as to help
-#     the user to determine the 'best' model for classifying images. Note that 
-#     the statistics calculated as the results are either percentages or counts.
-#     Parameters:
-#       results_dic - Dictionary with key as image filename and value as a List 
-#              (index)idx 0 = pet image label (string)
-#                     idx 1 = classifier label (string)
-#                     idx 2 = 1/0 (int)  where 1 = match between pet image and 
-#                             classifer labels and 0 = no match between labels
-#                     idx 3 = 1/0 (int)  where 1 = pet image 'is-a' dog and 
-#                             0 = pet Image 'is-NOT-a' dog. 
-#                     idx 4 = 1/0 (int)  where 1 = Classifier classifies image 
-#                             'as-a' dog and 0 = Classifier classifies image  
-#                             'as-NOT-a' dog.
-#     Returns:
-#      results_stats_dic - Dictionary that contains the results statistics (either
-#                     a percentage or a count) where the key is the statistic's 
-#                      name (starting with 'pct' for percentage or 'n' for count)
-#                      and the value is the statistic's value. See comments above
-#                      and the previous topic Calculating Results in the class for details
-#                      on how to calculate the counts and statistics.
-#     """        
-#     # Replace None with the results_stats_dic dictionary that you created with 
-#     # this function 
-#     return results_stats_dic
+# TODO 5: EDIT and ADD code BELOW to do the following that's stated in the 
+#       comments below that start with "TODO: 5" for the calculates_results_stats 
+#       function. Please be certain to replace None in the return statement with
+#       the results_stats_dic dictionary that you create with this function
+from classify_images import classify_images
+from os import listdir,path
+from classifier import classifier
+from get_pet_labels import get_pet_labels
+
+import ast
+from PIL import Image
+import torchvision.transforms as transforms
+from torch.autograd import Variable
+import torchvision.models as models
+from torch import __version__
+
+
+resnet18 = models.resnet18(pretrained=True)
+alexnet = models.alexnet(pretrained=True)
+# vgg16 = models.vgg16(pretrained=True)
+
+models = {'resnet': resnet18, 'alexnet': alexnet}
+from adjust_results4_isadog import adjust_results4_isadog
+# 
 def calculates_results_stats(results_dic):
     """
     Calculates statistics of the results of the program run using classifier's model 
@@ -140,18 +108,6 @@ def calculates_results_stats(results_dic):
             results_stats_dic['n_match'] += 1
             if results_dic[key][3] == 1:
                 results_stats_dic['n_correct_breed'] += 1
-
-        # TODO: 5a. REPLACE pass with CODE that counts how many pet images of
-        #           dogs had their breed correctly classified. This happens 
-        #           when the pet image label indicates the image is-a-dog AND 
-        #           the pet image label and the classifier label match. You 
-        #           will need to write a conditional statement that determines
-        #           when the dog breed is correctly classified and then 
-        #           increments 'n_correct_breed' by 1. Recall 'n_correct_breed' 
-        #           is a key in the results_stats_dic dictionary with it's value 
-        #           representing the number of correctly classified dog breeds.
-        #           
-        # Pet Image Label is a Dog AND Labels match- counts Correct Breed
        
         
         # Pet Image Label is a Dog - counts number of dog images
@@ -179,7 +135,8 @@ def calculates_results_stats(results_dic):
         #           
         # Pet Image Label is NOT a Dog
         else:
-            results_stats_dic['n_correct_notdogs'] += 1
+                if results_dic[key][4] == 0:
+                    results_stats_dic['n_correct_notdogs'] += 1
             # Classifier classifies image as NOT a Dog(& pet image isn't a dog)
             # counts number of correct NOT dog clasifications.
             
@@ -235,3 +192,5 @@ def calculates_results_stats(results_dic):
     # created with this function 
     return results_stats_dic
 
+
+# print(calculates_results_stats(adjust_results4_isadog(classify_images('pet_images/', get_pet_labels('pet_images'), resnet18),'dognames.txt')))

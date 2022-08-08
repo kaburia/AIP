@@ -31,6 +31,8 @@ def get_pet_labels(image_dir):
     
     
     for ran in range(len(filename)):
+        if filename[ran][0] == '.':
+            continue
         pet_lower_list = filename[ran].lower().split('_')
         pet_name = ''
         for word in pet_lower_list:
@@ -39,7 +41,7 @@ def get_pet_labels(image_dir):
         pet_labels.append(pet_name.strip())
         pet_name = ''
         if filename[ran] not in results_dic:
-            results_dic[filename[ran]] = pet_labels[ran]
+            results_dic[filename[ran]] = [pet_labels[ran]]
 #             print(pet_labels[ran])
     """
     Creates a dictionary of pet labels (results_dic) based upon the filenames 
@@ -61,4 +63,4 @@ def get_pet_labels(image_dir):
     # function
     return results_dic
 
-# print(get_pet_labels('pet_images'))
+

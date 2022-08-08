@@ -43,24 +43,6 @@
 #       comments below that start with "TODO: 5" for the calculates_results_stats 
 #       function. Please be certain to replace None in the return statement with
 #       the results_stats_dic dictionary that you create with this function
-from classify_images import classify_images
-from os import listdir,path
-from classifier import classifier
-from get_pet_labels import get_pet_labels
-
-import ast
-from PIL import Image
-import torchvision.transforms as transforms
-from torch.autograd import Variable
-import torchvision.models as models
-from torch import __version__
-
-resnet18 = models.resnet18(weights=True)
-alexnet = models.alexnet(weights=True)
-# vgg16 = models.vgg16(pretrained=True)
-
-models = {'resnet': resnet18, 'alexnet': alexnet}
-from adjust_results4_isadog import adjust_results4_isadog
 # 
 def calculates_results_stats(results_dic):
     """
@@ -201,6 +183,3 @@ def calculates_results_stats(results_dic):
     # TODO 5f. REPLACE None with the results_stats_dic dictionary that you 
     # created with this function 
     return results_stats_dic
-
-
-# print(calculates_results_stats(adjust_results4_isadog(classify_images('pet_images/', get_pet_labels('pet_images'), resnet18),'dognames.txt')))

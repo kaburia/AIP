@@ -36,30 +36,11 @@
 #       Notice that this function doesn't return anything because the 
 #       results_dic dictionary that is passed into the function is a mutable 
 #       data type so no return is needed.
-
-from classify_images import classify_images
-from os import listdir,path
-from classifier import classifier
-from get_pet_labels import get_pet_labels
-
-import ast
-from PIL import Image
-import torchvision.transforms as transforms
-from torch.autograd import Variable
-import torchvision.models as models
-from torch import __version__
-
-resnet18 = models.resnet18(weights=True)
-alexnet = models.alexnet(weights=True)
-# vgg16 = models.vgg16(pretrained=True)
-
-models = {'resnet': resnet18, 'alexnet': alexnet}
 # 
 def adjust_results4_isadog(results_dic, dogfile):
     with open(dogfile, 'r') as dogf:
         dog = dogf.read().split('\n')
-    # for i in dog:
-        for j,k in results_dic.items():
+    for j,k in results_dic.items():
 #             pet labels check
             if k[0] in dog:
                 k.append(1)
@@ -70,13 +51,12 @@ def adjust_results4_isadog(results_dic, dogfile):
                 k.append(1)
             else:
                 k.append(0)
-    # return results_dic
             
 #         print(i)
-    return results_dic
+#     print(results_dic)
 
-# print(adjust_results4_isadog(classify_images('pet_images/', get_pet_labels('pet_images'), resnet18),'dognames.txt'))
-"""
+        
+    """
     Adjusts the results dictionary to determine if classifier correctly 
     classified images 'as a dog' or 'not a dog' especially when not a match. 
     Demonstrates if model architecture correctly classifies dog images even if

@@ -24,7 +24,6 @@
 from classifier import classifier 
 from os import listdir
 
-
 # TODO 3: Define classify_images function below, specifically replace the None
 #       below by the function definition of the classify_images function. 
 #       Notice that this function doesn't return anything because the 
@@ -33,17 +32,13 @@ from os import listdir
 # 
 def classify_images(images_dir, results_dic, model):
     for key in results_dic:
-        moded = classifier(images_dir+key, model).lower().strip()
-        truth = results_dic[key]
-        if truth in moded:
-            results_dic[key] = [truth, moded, 1]
+        model_label = classifier(images_dir+key, model).lower().strip()
+        # truth = results_dic[key]
+        if results_dic[key][0] in model_label:
+            results_dic[key] = [results_dic[key][0], model_label, 1]
         else:
-            results_dic[key] = [truth, moded, 0]
-    return results_dic
-
-  
+            results_dic[key] = [results_dic[key][0], model_label, 0]
         
-# classify_images(listdir('pet_images'), get_pet_labels('pet_images'), )
     """
     Creates classifier labels with classifier function, compares pet labels to 
     the classifier labels, and adds the classifier label and the comparison of 
