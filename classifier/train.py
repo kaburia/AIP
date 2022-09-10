@@ -55,7 +55,7 @@ testloader = torch.utils.data.DataLoader(test_dataset, batch_size=64)
 
    
 # Train a model
-def train(model_name, epochs, learning_rate=0.03):
+def train(model_name, epochs=1, learning_rate=0.03, device='cpu'):
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -99,6 +99,8 @@ def train(model_name, epochs, learning_rate=0.03):
     steps = 0
     running_loss = 0
     print_every = 5
+
+    print(f'Beginning Training: Model: {model_name}, Epochs: {epochs}, Device: {device}')
     for epoch in range(epochs):
         for inputs, labels in trainloader:
             steps += 1
@@ -111,7 +113,7 @@ def train(model_name, epochs, learning_rate=0.03):
             loss = criterion(logps, labels)            
             
             loss.backward()
-            print('training loss: {}'.format(loss.item()))
+            # print('training loss: {}'.format(loss.item()))
             optimizer.step()
 
             running_loss += loss.item()
@@ -141,14 +143,23 @@ def train(model_name, epochs, learning_rate=0.03):
                 running_loss = 0
                 model.train()
 
+    # Saving the model with the model name
+    torch.save(model.state_dict(), f'{model_name}.pth')
+
+
     
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dir', default='flower/', type=str, help='path to flower images')
+    # parser.add_argument('--dir', default='flower/', type=str, help='path to flower images')
     parser.add_argument('--arch', default='densenet', type=str, help='Model Architecture')
     parser.add_argument('--epochs', default=1, type=int, help='Number of epochs')
     parser.add_argument('--learning_rate', default=0.03, type=int, help='Set Learning rate')
+    parser.add_argument('--gpu', default='cpu', type=str, help='Device training from GPU/CPU')
+
+    # Given a choice of input of directory
+    parser.add_argument('--in_dir', type=str, help='The input directory to feed into the model')
+    parser.add_argument('--out_dir', type=str, help='The output to save the model')
 
     args = parser.parse_args()
 
@@ -157,8 +168,25 @@ def parse_args():
 def main():
     args = parse_args()
 
+
+    if args.arch:  
+        if args.epochs or args.learning_rate or args.gpu:
+            train(args.arch, learning_rate=args.learning_rate, epochs=args.epochs, device=args.gpu)
+        train(args.arch)
+
+    # if args.gpu:
+        # train(args.arch, device=args.gpu)
+
     # if args.dir:
 
 
 if __name__ == '__main__':
     main()
+
+
+
+# Set directory to save checkpoints
+# Choose a specific directory to perform Training on
+# Create a function to obtain the path of the input directory
+# Check the format of the images
+# If scattered create labels and group to pass into ImageFolder easily
