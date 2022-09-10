@@ -11,6 +11,7 @@ import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
+import argparse
 
 densenet121 = models.densenet121(weights='DenseNet121_Weights.DEFAULT')
 resnet18 = models.resnet18(weights='ResNet18_Weights.DEFAULT')
@@ -54,7 +55,7 @@ testloader = torch.utils.data.DataLoader(test_dataset, batch_size=64)
 
    
 # Train a model
-def train(model_name, epochs):
+def train(model_name, epochs, learning_rate=0.03):
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -90,7 +91,7 @@ def train(model_name, epochs):
     criterion = nn.NLLLoss()
 
     # Only train the classifier parameters, feature parameters are frozen
-    optimizer = Adam(model.parameters(), lr=0.003)
+    optimizer = Adam(model.parameters(), lr=learning_rate)
 
     model.to(device);
 
@@ -139,5 +140,25 @@ def train(model_name, epochs):
                     f"Validation accuracy: {accuracy/len(val_loader):.3f}")
                 running_loss = 0
                 model.train()
+
     
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--dir', default='flower/', type=str, help='path to flower images')
+    parser.add_argument('--arch', default='densenet', type=str, help='Model Architecture')
+    parser.add_argument('--epochs', default=1, type=int, help='Number of epochs')
+    parser.add_argument('--learning_rate', default=0.03, type=int, help='Set Learning rate')
+
+    args = parser.parse_args()
+
+    return args
+
+def main():
+    args = parse_args()
+
+    # if args.dir:
+
+
+if __name__ == '__main__':
+    main()
