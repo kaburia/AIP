@@ -13,6 +13,9 @@ import numpy as np
 from PIL import Image
 import argparse
 
+from data import trainloader, val_loader, testloader
+
+
 densenet121 = models.densenet121(weights='DenseNet121_Weights.DEFAULT')
 resnet18 = models.resnet18(weights='ResNet18_Weights.DEFAULT')
 alexnet = models.alexnet(weights='AlexNet_Weights.DEFAULT')
@@ -23,39 +26,10 @@ model2 = {'densenet': densenet121,
           'alexnet': alexnet}
 
 
-# Load and transform images
-img_path = 'flower'
-
-
-train_transform = transforms.Compose([transforms.RandomRotation(30),
-                                              transforms.RandomResizedCrop(224),
-                                              transforms.RandomHorizontalFlip(),
-                                              transforms.ToTensor(),
-                                              transforms.Normalize([0.485, 0.456, 0.406],
-                                                                    [0.229, 0.224, 0.225])])
-
-train_dataset = datasets.ImageFolder(img_path + '/train', transform=train_transform)
-
-trainloader = torch.utils.data.DataLoader(train_dataset, batch_size=64, shuffle=True)
-
-
-test_transforms  = transforms.Compose((transforms.Resize(255),
-                                      transforms.CenterCrop(224),
-                                      transforms.ToTensor(),
-                                      transforms.Normalize([0.485, 0.456, 0.406],
-                                                           [0.229, 0.224, 0.225])))
-
-val_dataset = datasets.ImageFolder(img_path + '/valid', transform=test_transforms)
-val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=64)
-
-
-test_dataset = datasets.ImageFolder(img_path + '/test', transform=test_transforms)
-testloader = torch.utils.data.DataLoader(test_dataset, batch_size=64)
-
 
    
 # Train a model
-def train(model_name, epochs=1, learning_rate=0.03, device='cpu'):
+def train(img_path, model_name, epochs=1, learning_rate=0.03, device='cpu'):
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -69,7 +43,7 @@ def train(model_name, epochs=1, learning_rate=0.03, device='cpu'):
     if model_name.lower() == 'alexnet':
         model.classifier = nn.Sequential(nn.Linear(9216, 4896),
                                     nn.ReLU(),
-                                    nn.Linear(2896, 2448),
+                                    nn.Linear(4896, 2448),
                                     nn.ReLU(),
                                     nn.Linear(2448,102),
                                     nn.LogSoftmax(dim=1))
@@ -100,9 +74,9 @@ def train(model_name, epochs=1, learning_rate=0.03, device='cpu'):
     running_loss = 0
     print_every = 5
 
-    print(f'Beginning Training: Model: {model_name}, Epochs: {epochs}, Device: {device}')
+    print(f'Beginning Training:\nDirectory: {img_path} Model: {model_name}, Epochs: {epochs}, Device: {device}')
     for epoch in range(epochs):
-        for inputs, labels in trainloader:
+        for inputs, labels in trainloader(img_path):
             steps += 1
             optimizer.zero_grad()
 
@@ -123,7 +97,7 @@ def train(model_name, epochs=1, learning_rate=0.03, device='cpu'):
                 accuracy = 0
                 model.eval()
                 with torch.no_grad():
-                    for inputs, labels in val_loader:
+                    for inputs, labels in val_loader(img_path):
                         inputs, labels = inputs.to(device), labels.to(device)
                         logps = model.forward(inputs)
                         batch_loss = criterion(logps, labels)
@@ -151,7 +125,7 @@ def train(model_name, epochs=1, learning_rate=0.03, device='cpu'):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    # parser.add_argument('--dir', default='flower/', type=str, help='path to flower images')
+    parser.add_argument('--dir', default='flower/', type=str, help='path to flower images')
     parser.add_argument('--arch', default='densenet', type=str, help='Model Architecture')
     parser.add_argument('--epochs', default=1, type=int, help='Number of epochs')
     parser.add_argument('--learning_rate', default=0.03, type=int, help='Set Learning rate')
@@ -169,10 +143,10 @@ def main():
     args = parse_args()
 
 
-    if args.arch:  
+    if args.arch or args.dir:  
         if args.epochs or args.learning_rate or args.gpu:
-            train(args.arch, learning_rate=args.learning_rate, epochs=args.epochs, device=args.gpu)
-        train(args.arch)
+            train(args.dir, args.arch, learning_rate=args.learning_rate, epochs=args.epochs, device=args.gpu)
+        # train(args.dir, args.arch)
 
     # if args.gpu:
         # train(args.arch, device=args.gpu)
