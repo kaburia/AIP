@@ -20,15 +20,22 @@ def trainloader(img_path):
     
     return train_loader
 
-# Train validation data
+# validation and test transforms
 
-
-def val_loader(img_path):
+def transforming():
     test_transforms  = transforms.Compose((transforms.Resize(255),
                                       transforms.CenterCrop(224),
                                       transforms.ToTensor(),
                                       transforms.Normalize([0.485, 0.456, 0.406],
                                                            [0.229, 0.224, 0.225])))
+    return test_transforms
+
+
+# Train validation data
+
+
+def val_loader(img_path):
+    test_transforms  = transforming()
 
     val_dataset = datasets.ImageFolder(img_path + '/valid', transform=test_transforms)
     valloader = torch.utils.data.DataLoader(val_dataset, batch_size=64)
@@ -37,11 +44,7 @@ def val_loader(img_path):
 
 
 def testloader(img_path):
-    test_transforms  = transforms.Compose((transforms.Resize(255),
-                                      transforms.CenterCrop(224),
-                                      transforms.ToTensor(),
-                                      transforms.Normalize([0.485, 0.456, 0.406],
-                                                           [0.229, 0.224, 0.225])))
+    test_transforms  = transforming()
 
     test_dataset = datasets.ImageFolder(img_path + '/test', transform=test_transforms)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=64)
