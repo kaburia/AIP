@@ -25,6 +25,7 @@ model2 = {'densenet': densenet121,
 # Load and transform images
 img_path = 'flower'
 
+
 train_transform = transforms.Compose([transforms.RandomRotation(30),
                                               transforms.RandomResizedCrop(224),
                                               transforms.RandomHorizontalFlip(),
@@ -51,36 +52,11 @@ test_dataset = datasets.ImageFolder(img_path + '/test', transform=test_transform
 testloader = torch.utils.data.DataLoader(test_dataset, batch_size=64)
 
 
-# Define neural network 
-class Network(nn.Module): 
-   def __init__(self, input_size, output_size): 
-       super(Network, self).__init__() 
-        
-       self.layer1 = nn.Linear(input_size, 256) 
-       self.layer2 = nn.Linear(256, 108) 
-       self.layer3 = nn.Linear(108, output_size) 
-
-
-   def forward(self, x): 
-       x1 = F.relu(self.layer1(x)) 
-       x2 = F.relu(self.layer2(x1)) 
-       x3 = self.layer3(x2) 
-       return x3 
- 
-
    
 # Train a model
 def train(model_name, epochs):
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-    # Alexnet
-    if model_name == 'alexnet':
-        model = Network(4096, 102)
-    elif model_name == 'densenet121':
-        model = Network(1024, 102)
-    # elif model_name == 'resnet18':
-        # model = Network(512, 102)
 
     # Use a pretrained model
     model = model2[model_name]
@@ -88,6 +64,28 @@ def train(model_name, epochs):
     # Freeze parameters to avoid backpropagation through them
     for param in model.parameters():
         param.requires_grad = False
+
+    if model_name.lower() == 'alexnet':
+        model.classifier = nn.Sequential(nn.Linear(9216, 4896),
+                                    nn.ReLU(),
+                                    nn.Linear(2896, 2448),
+                                    nn.ReLU(),
+                                    nn.Linear(2448,102),
+                                    nn.LogSoftmax(dim=1))
+    elif model_name.lower() == 'densenet':
+        model.classifier = nn.Sequential(nn.Linear(1024, 512),
+                                 nn.ReLU(),
+                                 nn.Linear(512, 256),
+                                 nn.ReLU(),
+                                 nn.Linear(256,102),
+                                 nn.LogSoftmax(dim=1))
+    elif model_name.lower() == 'resnet':
+        model.fc = nn.Sequential(nn.Linear(512, 512),
+                                 nn.ReLU(),
+                                 nn.Linear(512, 256),
+                                 nn.ReLU(),
+                                 nn.Linear(256,102),
+                                 nn.LogSoftmax(dim=1))
 
     criterion = nn.NLLLoss()
 
@@ -103,14 +101,16 @@ def train(model_name, epochs):
     for epoch in range(epochs):
         for inputs, labels in trainloader:
             steps += 1
+            optimizer.zero_grad()
+
             # Move input and label tensors to the default device
             inputs, labels = inputs.to(device), labels.to(device)
             
-            logps = model.forward(inputs)
-            loss = criterion(logps, labels)
+            logps = model(inputs)
+            loss = criterion(logps, labels)            
             
-            optimizer.zero_grad()
             loss.backward()
+            print('training loss: {}'.format(loss.item()))
             optimizer.step()
 
             running_loss += loss.item()
@@ -140,12 +140,4 @@ def train(model_name, epochs):
                 running_loss = 0
                 model.train()
     
-
-# print(alexnet.classifier)
-# print(densenet121.classifier)
-# print(type(model['alexnet']))
-# print(resnet18)
-
-train('resnet', 1)
-
 
