@@ -1,7 +1,7 @@
 # Run the various models
-python train.py --arch resnet
-python train.py --arch densnet
-python train.py --arch alexnet
+python train.py --arch resnet --dir flower/ --epochs 10 --gpu gpu
+python train.py --arch densnet --dir flower/ --epochs 10 --gpu gpu
+python train.py --arch alexnet --dir flower/ --epochs 10 --gpu gpu
 
 
 
