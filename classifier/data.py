@@ -1,6 +1,6 @@
 import torch
-from torchvision import models, transforms, datasets
-from torch import nn
+from torchvision import transforms, datasets
+
 
 
 
@@ -15,13 +15,12 @@ def trainloader(img_path):
                                                                     [0.229, 0.224, 0.225])])
 
     train_dataset = datasets.ImageFolder(img_path + '/train', transform=train_transform)
-
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=64, shuffle=True)
     
     return train_loader
 
-# validation and test transforms
 
+# validation and test transforms
 def transforming():
     test_transforms  = transforms.Compose((transforms.Resize(255),
                                       transforms.CenterCrop(224),
@@ -31,9 +30,8 @@ def transforming():
     return test_transforms
 
 
+
 # Train validation data
-
-
 def val_loader(img_path):
     test_transforms  = transforming()
 
