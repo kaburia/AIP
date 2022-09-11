@@ -37,11 +37,11 @@ def imshow(image, ax=None, title=None):
     
     return ax
 
-
 def image_shown(image):
     processed = process_image(image)
-    
-    return imshow(processed)
+    imshow(processed)
+    plt.show()
+    # return imshow(processed)
 
-image_shown('image_06743.jpg')
+# image_shown('lenna.jpg')
 

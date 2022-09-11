@@ -53,4 +53,5 @@ def saved_model(model_name):
     # '''state = torch.load(f'{model_name}.pth') ''' -- TO USE THIS FOR FUTURE MODELS
     state = torch.load('checkpoint.pth', map_location=torch.device('cpu'))
     model = modelling(model_name)
-    return model.load_state_dict(state)
+    model.load_state_dict(state)
+    return model.eval()

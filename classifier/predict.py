@@ -17,39 +17,42 @@ with open('cat_to_name.json', 'r') as f:
 
 
 
-def predict(image_path, model_name, topk=5):
+def predict(image, model_name, top=5):
     
     ''' Predict the class (or classes) of an image using a trained deep learning model.
     '''
     model = saved_model(model_name)
-    model.eval()
-    image = process_image(image_path).unsqueeze(dim=0)
+    # model.eval()
+    imag = process_image(image).unsqueeze(dim=0)
 
     with torch.no_grad():
-        output = model.forward(image)
+        # model.eval()
+        output = model.forward(imag)
 
     ps = torch.exp(output)
-    ps = ps
-    classes = ps.topk(topk, dim=1)
+    probs,classes = ps.topk(top, dim=1)
+    # print(classes)
+
     # equals = top_class == 
 
     return classes
 
 
 # TODO: Display an image along with the top 5 classes
-def view(image_path, model, topk=5):
+def view(image, model_name, topk=5):
+    # model = saved_model(model_name)
 
-    probs, classes = predict(image_path, model) 
-    image = process_image(image_path) 
+    classes = predict(image, model_name) 
+    imag = process_image(image) 
       
     
     clas_im = []
     for top_class in classes.numpy()[0]:
-        clas_im.append(cat_to_name[str(top_class)])
+        clas_im.append(cat_to_name[str(top_class+1)])
     plt.subplots()
     x = plt.barh(clas_im, width=0.000001)
-    image = imshow(image)
-    return plt.show()    
+    image = imshow(imag)
+    plt.show()    
 
 
 
@@ -64,7 +67,7 @@ def main():
 
 if __name__ == '__main__':
     # main()
-    view('flower/test/1/image_06743', )
+    view('flower/test/1/image_06743.jpg', 'densenet')
 
 
 
@@ -77,3 +80,6 @@ Return top KK most likely classes: python predict.py input checkpoint --top_k 3
 Use a mapping of categories to real names: python predict.py input checkpoint --category_names cat_to_name.json
 Use GPU for inference: python predict.py input checkpoint --gpu
 '''
+
+
+# Images only work with RGB
