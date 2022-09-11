@@ -3,50 +3,25 @@ import torch
 from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
-
+from torchvision import models
 import json
+
+from modelling import saved_model
+from process_image import process_image, imshow
+
+
+
 
 with open('cat_to_name.json', 'r') as f:
     cat_to_name = json.load(f)
 
-# Load a trained model
 
-def process_image(image):
-    ''' Scales, crops, and normalizes a PIL image for a PyTorch model,
-        returns an Numpy array
-    '''
-    transforming = transforming()
-    
-    img = Image.open(image)
 
-    return transforming(img)
-
-def imshow(image, ax=None, title=None):
-    """Imshow for Tensor."""
-    if ax is None:
-        fig, ax = plt.subplots()
-    
-    # PyTorch tensors assume the color channel is the first dimension
-    # but matplotlib assumes is the third dimension
-    image = image.numpy()
-    image = image.transpose((1, 2, 0))
-    
-    # Undo preprocessing
-    mean = np.array([0.485, 0.456, 0.406])
-    std = np.array([0.229, 0.224, 0.225])
-    image = std * image + mean
-    
-    # Image needs to be clipped between 0 and 1 or it looks like noise when displayed
-    image = np.clip(image, 0, 1)
-    
-    ax.imshow(image)
-    
-    return ax
-
-def predict(image_path, model, topk=5):
+def predict(image_path, model_name, topk=5):
     
     ''' Predict the class (or classes) of an image using a trained deep learning model.
     '''
+    model = saved_model(model_name)
     model.eval()
     image = process_image(image_path).unsqueeze(dim=0)
 
@@ -59,10 +34,9 @@ def predict(image_path, model, topk=5):
     # equals = top_class == 
 
     return classes
-    # TODO: Implement the code to predict the class from an image file
+
 
 # TODO: Display an image along with the top 5 classes
-
 def view(image_path, model, topk=5):
 
     probs, classes = predict(image_path, model) 
@@ -78,6 +52,10 @@ def view(image_path, model, topk=5):
     return plt.show()    
 
 
+
+
+
+
 def parse():
     pass
 
@@ -85,7 +63,8 @@ def main():
     pass
 
 if __name__ == '__main__':
-    main()
+    # main()
+    view('flower/test/1/image_06743', )
 
 
 

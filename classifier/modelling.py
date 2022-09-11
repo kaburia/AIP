@@ -12,7 +12,7 @@ model2 = {'densenet': densenet121,
           'resnet': resnet18,
           'alexnet': alexnet}
 
-          
+
 
 def modelling(model_name, device='cpu'):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -46,3 +46,11 @@ def modelling(model_name, device='cpu'):
                                  nn.Linear(256,102),
                                  nn.LogSoftmax(dim=1))
     return model
+
+
+# Loading saved models
+def saved_model(model_name):
+    # '''state = torch.load(f'{model_name}.pth') ''' -- TO USE THIS FOR FUTURE MODELS
+    state = torch.load('checkpoint.pth', map_location=torch.device('cpu'))
+    model = modelling(model_name)
+    return model.load_state_dict(state)
