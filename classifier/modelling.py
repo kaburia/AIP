@@ -34,6 +34,7 @@ def modelling(model_name, device='cpu'):
     elif model_name.lower() == 'densenet':
         model.classifier = nn.Sequential(nn.Linear(1024, 512),
                                  nn.ReLU(),
+                                 nn.Dropout(0.3),
                                  nn.Linear(512, 256),
                                  nn.ReLU(),
                                  nn.Linear(256,102),
@@ -55,3 +56,5 @@ def saved_model(model_name):
     model = modelling(model_name)
     model.load_state_dict(state)
     return model.eval()
+
+# print(saved_model('densenet'))

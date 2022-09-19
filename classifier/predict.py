@@ -1,59 +1,34 @@
-from data import transforming
 import torch
-from PIL import Image
-import matplotlib.pyplot as plt
-import numpy as np
-from torchvision import models
-import json
 
 from modelling import saved_model
-from process_image import process_image, imshow
+from process_image import process_image
 
 
 
 
-with open('cat_to_name.json', 'r') as f:
-    cat_to_name = json.load(f)
 
 
-
-def predict(image, model_name, top=5):
+def predict(image_path, model, topk=5):
     
     ''' Predict the class (or classes) of an image using a trained deep learning model.
     '''
-    model = saved_model(model_name)
-    # model.eval()
-    imag = process_image(image).unsqueeze(dim=0)
+    
+    image = process_image(image_path).unsqueeze(dim=0)
 
     with torch.no_grad():
-        # model.eval()
-        output = model.forward(imag)
+      model.eval()
+      output = model.forward(image)
 
     ps = torch.exp(output)
-    probs,classes = ps.topk(top, dim=1)
-    # print(classes)
+    # label = labels.cpu()
+    ps, classes = ps.topk(topk, dim=1)
+    # equals = classes == label.view(*top_class.shape)
 
-    # equals = top_class == 
-
-    return classes
+    return ps, classes
+    # TODO: Implement the code to predict the class from an image file
 
 
 # TODO: Display an image along with the top 5 classes
-def view(image, model_name, topk=5):
-    # model = saved_model(model_name)
-
-    classes = predict(image, model_name) 
-    imag = process_image(image) 
-      
-    
-    clas_im = []
-    for top_class in classes.numpy()[0]:
-        clas_im.append(cat_to_name[str(top_class+1)])
-    plt.subplots()
-    x = plt.barh(clas_im, width=0.000001)
-    image = imshow(imag)
-    plt.show()    
-
 
 
 
@@ -66,8 +41,8 @@ def main():
     pass
 
 if __name__ == '__main__':
-    # main()
-    view('flower/test/1/image_06743.jpg', 'densenet')
+    main()
+    # view('flower/test/1/image_06743.jpg', 'densenet')
 
 
 

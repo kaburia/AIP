@@ -1,18 +1,19 @@
 from predict import predict
 from process_image import process_image, imshow
 import matplotlib.pyplot as plt
-import json 
 import argparse
-import os
+from modelling import saved_model, modelling
 
-from train import parse_args
+
+# from train import parse_args
 from labels import labels
 
 
 def view(image, model_name, topk=5):
+    model = saved_model(model_name)
+    # model = modelling(model_name)
     # model = saved_model(model_name)
-
-    probs, classes = predict(image, model_name) 
+    probs, classes = predict(image, model) 
     imag = process_image(image) 
       
     
@@ -24,7 +25,7 @@ def view(image, model_name, topk=5):
 
 def parse():
     parser= argparse.ArgumentParser()
-    parser.add_argument('image', type=str, help='Image file to view')
+    parser.add_argument('--image', type=str, help='Image file to view')
     parser.add_argument('--model', default='densenet', type=str, help='Model Architecture')
     parser.add_argument('--topk', default=5, type=int, help='Top values to display')
 
@@ -33,7 +34,7 @@ def parse():
     return args
 
 def main():
-    args= parse_args()
+    args= parse()
 
     if args.image:
         view(args.image, args.model, args.topk)
