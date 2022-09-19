@@ -3,28 +3,24 @@ from process_image import process_image, imshow
 import matplotlib.pyplot as plt
 import json 
 import argparse
+import os
 
 from train import parse_args
-
-with open('cat_to_name.json', 'r') as f:
-    cat_to_name = json.load(f)
-
+from labels import labels
 
 
 def view(image, model_name, topk=5):
     # model = saved_model(model_name)
 
-    classes = predict(image, model_name) 
+    probs, classes = predict(image, model_name) 
     imag = process_image(image) 
       
     
-    clas_im = []
-    for top_class in classes.numpy()[0]:
-        clas_im.append(cat_to_name[str(top_class+1)])
-    plt.subplots()
-    x = plt.barh(clas_im, width=0.000001)
+    clas_im = [labels()[str(top_class)] for top_class in classes.numpy()[0]]
+    prbs = [pr for pr in probs.numpy()[0]]
+    x = plt.barh(clas_im, prbs, color='purple')
     image = imshow(imag)
-    plt.show()    
+    return plt.show() 
 
 def parse():
     parser= argparse.ArgumentParser()
